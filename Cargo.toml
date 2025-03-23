@@ -12,7 +12,11 @@ println = []
 
 [dependencies]
 # esp32开发相关
-esp-hal = "0.23.1"
+esp-hal = { version = "0.23.1", features = ["esp32s3"] }
+# 用于操作低功耗riscv核
+esp-lp-hal = { version = "0.1.0", features = ["esp32s3", "embedded-io", "debug"] }
+
+
 # esp-hal = { git = "https://github.com/esp-rs/esp-hal", features = [ "esp32s3" ] }
 # esp-println = { git = "https://github.com/esp-rs/esp-hal", features = ["esp32s3", "log"] }
 # esp-alloc = { git = "https://github.com/esp-rs/esp-hal" }
@@ -32,12 +36,13 @@ esp-hal = "0.23.1"
 #     "wifi",
 # ] }
 
-# embassy框架相关
+# embassy框架相关(配合esp-hal-embassy)
 embassy-executor = { version = "0.6.3", features = ["task-arena-size-65536"] }
 embassy-futures = { version = "0.1.1" }
 embassy-sync = { version = "0.6.1" }
 embassy-time-driver = { version = "0.1.0", features = [ "tick-hz-1_000_000" ] }
 embassy-time = { version = "0.3.2" }
+embedded-io = { version = "0.6.1", features = ["defmt-03"] }
 
 # 静态变量
 static_cell = "2.1.0"
@@ -45,20 +50,18 @@ static_cell = "2.1.0"
 # 日志
 log = { version = "0.4.22" }
 
-embedded-io = "0.6.1"
-
 # 网络相关
-smoltcp = { version = "0.12.0", default-features = false, features = [
-    "medium-ethernet",
-    "proto-dhcpv4",
-    "proto-igmp",
-    "proto-ipv4",
-    "socket-dhcpv4",
-    "socket-icmp",
-    "socket-raw",
-    "socket-tcp",
-    "socket-udp",
-] }
+# smoltcp = { version = "0.12.0", default-features = false, features = [
+#     "medium-ethernet",
+#     "proto-dhcpv4",
+#     "proto-igmp",
+#     "proto-ipv4",
+#     "socket-dhcpv4",
+#     "socket-icmp",
+#     "socket-raw",
+#     "socket-tcp",
+#     "socket-udp",
+# ] }
 
 [profile.dev]
 opt-level = "s"

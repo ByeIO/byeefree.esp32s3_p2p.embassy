@@ -1,15 +1,10 @@
-# ESP-NOW backed serial connection
-Transparent serial link between two ESP32 devices. Primarily made for MAVLink
-communication with Holsatus Flight+Ground, but can be used for anything else.
-This code was originally thrown together quickly, so things can likely be
-improved. Feel free to submit changes.
+# 基于两个waveshare-esp32s3-geek开发板的点对点通信
+**🎉rust+esp-hal-embassy框架**
 
-If the ESP32 has an on-board LED, it will blink when the two devices are not
-paired, and light up constantly once they reliably receive each others heartbeat
-messages.
 
-## Xtensa toolchain
+## 使用说明
 
-This is designed for an Xtensa-based ESP32, so a toolchain must be installed
-manually. See [this](https://github.com/esp-rs/rust-build) repository for more
-information.
+
+
+## 开发说明
+### 引脚定义
