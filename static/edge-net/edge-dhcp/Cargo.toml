@@ -1,0 +1,30 @@
+[package]
+name = "edge-dhcp"
+version = "0.5.0"
+edition = "2021"
+rust-version = "1.83"
+description = "Async + `no_std` + no-alloc implementation of the DHCP protocol"
+repository = "https://github.com/ivmarkov/edge-net"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = [
+    "embedded",
+    "no-std::no-alloc",
+    "asynchronous",
+    "network-programming",
+]
+
+[features]
+default = ["io"]
+std = ["io"]
+io = ["embassy-futures", "embassy-time", "edge-nal"]
+
+[dependencies]
+heapless = { workspace = true }
+log = { workspace = true }
+rand_core = "0.6"
+embassy-futures = { workspace = true, optional = true }
+embassy-time = { workspace = true, default-features = false, optional = true }
+edge-nal = { workspace = true, optional = true }
+num_enum = { version = "0.7", default-features = false }
+edge-raw = { workspace = true, default-features = false }

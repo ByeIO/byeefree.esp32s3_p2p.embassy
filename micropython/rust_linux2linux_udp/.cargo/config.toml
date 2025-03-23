@@ -1,0 +1,3 @@
+# 默认构建目标平台
+[build]
+target = "aarch64-apple-darwin"

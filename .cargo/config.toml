@@ -1,3 +1,18 @@
+# 默认构建目标平台
+[build]
+target = "xtensa-esp32s3-none-elf"
+
+# 默认测试目标平台
+[test]
+target = "xtensa-esp32s3-none-elf"
+
+# 配置上传命令
+# [target.xtensa-esp32s3-none-elf]
+# runner = "cargo espflash flash"
+
+# 编译器特别要求
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
 
 # 使用本地依赖库文件夹
 # [source.crates-io]

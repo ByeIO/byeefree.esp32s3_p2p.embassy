@@ -1,0 +1,6 @@
+[package]
+name = "rust_linux2linux_udp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

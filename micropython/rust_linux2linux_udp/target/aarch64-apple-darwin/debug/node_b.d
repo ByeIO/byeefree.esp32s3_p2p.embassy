@@ -1,0 +1,1 @@
+/Users/workspace/Desktop/projects/ByeIO/software/exp210-esp32s3-p2p-embassy/micropython/rust_linux2linux_udp/target/aarch64-apple-darwin/debug/node_b: /Users/workspace/Desktop/projects/ByeIO/software/exp210-esp32s3-p2p-embassy/micropython/rust_linux2linux_udp/src/bin/node_b.rs

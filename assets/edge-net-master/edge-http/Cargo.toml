@@ -1,0 +1,34 @@
+[package]
+name = "edge-http"
+version = "0.5.1"
+edition = "2021"
+rust-version = "1.83"
+description = "Async + `no_std` + no-alloc implementation of the HTTP protocol"
+repository = "https://github.com/ivmarkov/edge-net"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = [
+    "embedded",
+    "no-std::no-alloc",
+    "asynchronous",
+    "web-programming::http-client",
+    "web-programming::http-server",
+]
+
+[features]
+default = ["io"]
+std = ["io"]
+io = ["embedded-io-async", "edge-nal", "embassy-sync", "embassy-futures", "embassy-time"]
+
+[dependencies]
+embedded-io-async = { workspace = true, optional = true }
+edge-nal = { workspace = true, optional = true }
+embedded-svc = { workspace = true, optional = true, default-features = false }
+heapless = { workspace = true }
+log = { workspace = true }
+embassy-sync = { workspace = true, optional = true }
+embassy-futures = { workspace = true, optional = true }
+embassy-time = { workspace = true, optional = true }
+httparse = { version = "1.7", default-features = false }
+base64 = { version = "0.13", default-features = false }
+sha1_smol = { version = "1", default-features = false }

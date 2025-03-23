@@ -1,10 +1,18 @@
 # 基于两个waveshare-esp32s3-geek开发板的点对点通信
 **🎉rust+esp-hal-embassy框架**
 
-
 ## 使用说明
 
 
+## 目录说明
+* .cargo : 编译器配置
+* assets : 开发参考代码
+* docs : 文档
+* src : 源码
+* static : 静态依赖
+* vendor : 所有依赖
+* 问题记录 : 开发问题问答记录
+* micropython : micropython版本代码
 
 ## 开发说明
 ### 引脚定义
@@ -12,5 +20,119 @@
 
 ### 主要依赖库及其说明
 ```toml
+[package]
+name = "byeefree_esp32s3_p2p_embassy"
+version = "0.1.1"
+authors = ["Peter Krull <peterkrullpeter@gmail.com>", "qsbye <2557877116@qq.com>"]
+edition = "2021"
+license = "Apache-2.0"
+description = "基于esp32s3的点对点通信无线串口"
 
+[dependencies]
+# esp32开发相关
+## 硬件抽象层
+esp-hal = { path = "./static/esp-rs/esp-hal", version = "1.0.0-beta.0", features = ["esp32s3", "unstable"] }
+## 调试信息打印
+esp-println = { path = "./static/esp-rs/esp-println", version = "0.13.1", features = ["esp32s3","log"] }
+## 用于操作低功耗riscv核
+# esp-lp-hal = { path = "./static/esp-rs/esp-lp-hal", version = "0.1.0", features = ["esp32s3", "embedded-io", "debug"] }
+## 内存分配
+esp-alloc = { path = "./static/esp-rs/esp-alloc", version = "0.7.0", features = ["defmt"] }
+## embassy(适配版)
+esp-hal-embassy = { path = "./static/esp-rs/esp-hal-embassy", version = "0.7.0", features = ["esp32s3", "defmt"] }
+## 调试信息追踪
+esp-backtrace = { path = "./static/esp-rs/esp-backtrace", version = "0.15.1", features = ["esp32s3", "defmt", "exception-handler", "panic-handler"] }
+## wifi相关
+esp-wifi = { path = "./static/esp-rs/esp-wifi", version = "0.13.0", features = ["esp32s3", "defmt", "wifi", "esp-now", "sniffer", "csi", "smoltcp", "serde"] }
+
+# embassy框架相关(配合esp-hal-embassy)
+## 执行器
+# embassy-executor = { path = "./static/embassy/embassy-executor", version = "0.7.0", features = ["task-arena-size-65536"] }
+## 期望返回值
+embassy-futures = { path = "./static/embassy/embassy-futures", version = "0.1.1" }
+## 同步
+embassy-sync = { path = "./static/embassy/embassy-sync", version = "0.6.2" }
+## 时钟驱动
+# embassy-time-driver = { path = "./static/embassy/embassy-time-driver", version = "0.2", features = [ "tick-hz-1_000_000" ] }
+## 时间
+# embassy-time = { path = "./static/embassy/embassy-time", version = "0.4.0", features=["defmt-timestamp-uptime", "mock-driver"] }
+
+# 嵌入式no_std环境的输入/输出操作(平替std::io)
+embedded-io = { version = "0.6.1", features = ["defmt-03"] }
+embedded-io-async = { version = "0.6.1", features = ["defmt-03"] }
+
+# 命令行解析
+embedded-cli = "0.2.1"
+
+# 调试信息打印
+defmt = "0.3"
+defmt-rtt = "0.4"
+# panic-probe = { version = "0.3", features = ["print-defmt"] }
+postcard = { version = "1.0.10" }
+
+# 序列化与反序列化
+serde = { version = "1.0.219", default-features = false, features = ["derive"] }
+
+# 内存分配
+heapless = { version = "0.8.0", features = ["portable-atomic"] }
+portable-atomic = { version = "1.10", features = ["critical-section"] }
+
+# 临界区访问
+critical-section = { version = "1.2.0", features = [] }
+
+# 元编程/宏编程
+paste = "1.0.15"
+
+# 单元测试
+defmt-test = "0.3.3"
+
+# 字符串格式化
+ufmt = "0.2.0"
+ufmt_float = "0.2.0"
+
+# 生命周期及延迟初始化
+static_cell = "2.1.0"
+# once_cell = "1.21.1"
+
+# 日志
+log = { version = "0.4.26" }
+
+# 浮点数计算支持
+libm = "0.2.11"
+num-traits = { version = "0.2", default-features = false, features = ["libm"] }
+
+# 网络相关
+edge-net = { path = "./static/edge-net", version = "0.10.1", features = ["embassy", "io"] }
+smoltcp = { path = "./static/smoltcp", version = "0.12.0", default-features = false, features = [
+    "medium-ethernet",
+    "proto-dhcpv4",
+    "proto-ipv4",
+    "socket-dhcpv4",
+    "socket-icmp",
+    "socket-raw",
+    "socket-tcp",
+    "socket-udp",
+    "defmt", 
+] }
+
+# 依赖覆盖
+[patch.crates-io]
+critical-section = { path = "./static/critical-section" , version = "1.2.0", features=["restore-state-u32"] }
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+# LLVM可以使用单线程执行更好的优化
+codegen-units = 1 
+debug = 2
+debug-assertions = false
+incremental = false
+lto = 'fat'
+opt-level = 's'
+overflow-checks = false
+
+# 防止编译器过度优化导致功能无法使用
+[profile.dev.package.esp-wifi]
+opt-level = 3
 ```

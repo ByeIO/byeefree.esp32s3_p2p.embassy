@@ -1,0 +1,31 @@
+[package]
+name = "edge-nal-embassy"
+version = "0.5.0"
+edition = "2021"
+rust-version = "1.83"
+description = "An implementation of edge-nal based on `embassy-net`"
+repository = "https://github.com/ivmarkov/edge-net"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = [
+    "embedded",
+    "no-std::no-alloc",
+    "asynchronous",
+    "network-programming",
+]
+
+[dependencies]
+embedded-io-async = { workspace = true }
+edge-nal = { workspace = true }
+heapless = { workspace = true }
+# Do not require these features and conditionalize the code instead
+embassy-net = { version = "0.6", features = [
+    "tcp",
+    "udp",
+    "dns",
+    "proto-ipv6",
+    "medium-ethernet",
+    "proto-ipv4",
+    "multicast",
+] }
+embassy-futures = { workspace = true }
