@@ -42,6 +42,8 @@ embassy-futures = { version = "0.1.1" }
 embassy-sync = { version = "0.6.1" }
 embassy-time-driver = { version = "0.1.0", features = [ "tick-hz-1_000_000" ] }
 embassy-time = { version = "0.3.2" }
+
+# 嵌入式no_std环境的输入/输出操作(平替std::io)
 embedded-io = { version = "0.6.1", features = ["defmt-03"] }
 
 # 静态变量
