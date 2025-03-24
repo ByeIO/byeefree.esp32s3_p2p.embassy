@@ -1,0 +1,15 @@
+[Unit]
+Description=ByeIO Byeefree esp32-tap-p2p Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/byefree_esp32_p2p
+User=_ByeIO_
+Group=_ByeIO_
+Restart=always
+RestartSec=3
+Environment=""
+Environment="" 
+
+[Install]
+WantedBy=multi-user.target

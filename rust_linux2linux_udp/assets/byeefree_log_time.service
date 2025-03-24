@@ -1,0 +1,20 @@
+[Unit]
+Description=ByeIO Byeefree Log Time Service
+After=network.target
+
+[Service]
+# 可指定运行用户（建议使用非root用户）
+User=_Byeefree_
+# 用户组
+UserGroup=_ByeIO_
+# 工作目录设为/tmp
+WorkingDirectory=/tmp
+# 可执行文件路径
+ExecStart=/usr/local/bin/byeefree_log_time_service.exec
+# 异常退出时自动重启
+Restart=always
+# 重启间隔
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

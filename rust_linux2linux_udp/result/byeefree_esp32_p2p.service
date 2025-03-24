@@ -1,0 +1,16 @@
+[Unit]
+Description=Ollama Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/ollama serve
+User=ollama
+Group=ollama
+Restart=always
+RestartSec=3
+Environment="PATH=/home/qsbye/anaconda3/bin:/home/qsbye/anaconda3/condabin:/home/qsbye/.local/bin:/home/qsbye/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+Environment="OLLAMA_HOST=0.0.0.0:11434" 
+Environment="OLLAMA_ORIGINS=*"
+
+[Install]
+WantedBy=default.target

@@ -1,3 +1,10 @@
 # 默认构建目标平台
 [build]
 target = "aarch64-apple-darwin"
+
+# 使用本地库
+# [source.crates-io]
+# replace-with = "vendored-sources"
+
+# [source.vendored-sources]
+# directory = "vendor"
