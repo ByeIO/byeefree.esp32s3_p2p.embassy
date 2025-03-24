@@ -6,8 +6,8 @@
 #include "GUI_Paint.h"
 #include "image.h"
 
-const char* ssid  = "ESP32-S3-GEEK";
-const char* password  = "Waveshare";
+const char* ssid  = "xiaomi.home";
+const char* password  = "xiaomiwifi";
 const char* ntpServer = "pool.ntp.org";
 const long  utcOffsetInSeconds = 28800; // Beijing: UTC +8 - Get the Eastern 8 Zone time (by default, the prime meridian of the Greenwich Observatory is the base line)
                                         // 28800 = 8 * 60 * 60
@@ -67,7 +67,7 @@ void loop() {
 
   Serial.print("Current time is: ");
   Serial.println(timeString);  /// Print time
-  Paint_DrawString_EN(55, 32, time, &Font24, BLACK, GREEN);
+  Paint_DrawString_EN(55, 32, time, &Font8, BLACK, GREEN);
   Paint_DrawString_EN(15, 82, date, &Font20, BLACK, GREEN);
   Paint_DrawString_EN(80, 82, (date + 6), &Font20, BLACK, GREEN);
   Paint_DrawString_EN(135, 82, (date + 10), &Font20, BLACK, GREEN);

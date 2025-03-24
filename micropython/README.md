@@ -59,8 +59,8 @@ Hard resetting via RTS pin...
 ```
 
 ## 开发
-- A的MAC: 18:8b:0e:cc:8a:24 
-- B的MAC: 18:8b:0e:cc:94:30
+- A(连接上位机)的MAC: 18:8b:0e:cc:8a:24 
+- B(连接计算板)的MAC: 18:8b:0e:cc:94:30
 使用Thonny IDE.
 ```sh
 lsusb

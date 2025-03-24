@@ -1,0 +1,9 @@
+default_fqbn: "esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,UploadSpeed=921600"
+default_export_binaries: true
+# ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES=true
+# default_programmer: atmel_ice
+# default_port: /dev/ttyACM0
+# default_port_config:
+#   baudrate: 115200
+# default_protocol: serial
+# default_profile: myprofile

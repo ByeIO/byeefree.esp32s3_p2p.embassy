@@ -1,8 +1,11 @@
 # 基于两个waveshare-esp32s3-geek开发板的点对点通信
 **🎉rust+esp-hal-embassy框架**
+**🐍micropython**
 
 ## 使用说明
-
+1. A节点插入上位机并运行转发程序rust_linux2linux_udp/node_a2
+2. B节点插入计算板(程序已配置为后台服务)
+3. A节点通过mosh/ssh连接计算板
 
 ## 目录说明
 * .cargo : 编译器配置
@@ -13,10 +16,18 @@
 * vendor : 所有依赖
 * 问题记录 : 开发问题问答记录
 * micropython : micropython版本代码
+* arduino : arduino-ide版本代码
+* rust_linux2linux_udp : 上位机程序
 
 ## 开发说明
 ### 引脚定义
-
+- USB接口默认为usb_cdc
+- LCD_BL = 7
+- LCD_DC = 8
+- LCD_CS = 10
+- LCD_SCK = 12
+- LCD_MOSI = 11
+- LCD_RST = 9
 
 ### 主要依赖库及其说明
 ```toml
@@ -136,3 +147,25 @@ overflow-checks = false
 [profile.dev.package.esp-wifi]
 opt-level = 3
 ```
+
+### 文件说明
+- micropython : micropython程序
+  - node_a : 节点A的micropython程序
+    * boot.py : 上电自启动程序
+    * main.py : 主程序
+  - node_b : 节点B的micropython程序
+    * boot.py : 上电自启动程序
+    * main.py : 主程序
+- rust_linux2linux_udp : 串口转发为udp/tcp形成虚拟网卡
+  - src : 源程序
+    - bin : 源程序
+      * node_a.rs : 上位机程序
+      * node_b.rs : 计算板的后台服务程序
+- static : 静态库
+- src : 源程序
+- arduino : arduino-ide程序
+  - node_a : 节点A的arduino程序
+    * node_a.ino : 程序入口
+  - node_b : 节点B的arduino程序
+    * node_b.ino : 程序入口
+  - libraries : 库文件

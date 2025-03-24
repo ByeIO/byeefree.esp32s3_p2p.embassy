@@ -1,0 +1,64 @@
+name: build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: arduino/setup-arduino-cli@v1
+      - id: cores
+        name: Refresh Arduino cores
+        run: |
+          echo 'https://arduino.esp8266.com/stable/package_esp8266com_index.json,https://espressif.github.io/arduino-esp32/package_esp32_index.json' >~/arduino-cores.txt
+          arduino-cli version
+          arduino-cli update --additional-urls "$(<~/arduino-cores.txt)"
+          echo d=$(sha256sum ~/.arduino15/package_*index.json | sha256sum | cut -d' ' -f1) >> $GITHUB_OUTPUT
+      - name: Cache Arduino cores
+        uses: actions/cache@v3
+        with:
+          path: ~/.arduino15/staging/packages
+          key: cores-${{ steps.cores.outputs.d }}
+      - name: Install Arduino cores
+        run: |
+          arduino-cli core install esp8266:esp8266 esp32:esp32 --additional-urls "$(<~/arduino-cores.txt)"
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends clang-format-11 doxygen
+      - uses: actions/checkout@v3
+      - name: Check code style
+        run: |
+          mk/format-code.sh
+          git diff --exit-code
+      - name: Prepare Arduino libraries
+        run: |
+          mkdir -p $HOME/Arduino/libraries
+          cd $HOME/Arduino/libraries
+          ln -s $GITHUB_WORKSPACE WifiEspNow
+      - name: Compile examples
+        run: |
+          for B in esp8266:esp8266:nodemcuv2 esp32:esp32:heltec_wifi_kit_32; do
+            for E in $(find ./examples -name '*.ino' -printf '%h\n'); do
+              printf "\n----\033[1;35m Build %s in %s \033[0m----\n" ${E##*/} $B
+              arduino-cli compile -b $B $E
+            done
+          done
+      - name: Build docs
+        run: docs/build.sh
+      - name: Deploy docs
+        uses: nwtgck/actions-netlify@30aa80fe8d5eec30813fc8b17b77e0a6663f09b5
+        with:
+          publish-dir: ./docs/html/
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: ${{ github.sha }} ${{ github.run_id }}
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          enable-commit-status: false
+          enable-github-deployment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: cd06b281-7d26-4689-a5d1-dcc1b3a1c3e3
+        if: ${{ github.repository == 'yoursunny/WifiEspNow' && github.event_name == 'push' }}
