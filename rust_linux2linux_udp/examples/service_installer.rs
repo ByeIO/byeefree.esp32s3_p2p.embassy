@@ -16,6 +16,9 @@ use embed_file::embed_bytes;
 fn main()-> Result<(), Box<dyn Error>>{
     // 新建用户组_ByeIO_和用户_Byeefree_
     let os_name = std::env::consts::OS;
+    
+    println!("当前操作系统为:{}", os_name);
+    
     match os_name {
         "linux" => linux_create_user_group()?,
         "macos" => macos_create_user_group()?,
@@ -38,6 +41,7 @@ fn main()-> Result<(), Box<dyn Error>>{
     let output_dir_1 = Path::new("/tmp/_Byeefree_");
     let output_dir_2 = Path::new("/etc/systemd/system");
     let output_dir_3 = Path::new("/Library/LaunchDaemons");
+    let output_dir_4 = Path::new("/usr/local/bin");
     
     // 递归创建目录
     fs::create_dir_all(output_dir_1)?;
@@ -45,7 +49,11 @@ fn main()-> Result<(), Box<dyn Error>>{
     // 构建输出文件路径 
     let output_service_path = output_dir_2.join("byeefree_log_time.service");
     let output_plist_path = output_dir_3.join("byeefree_log_time.plist");
-    let output_exec_path = output_dir_1.join("byeefree_log_time_service.exec");
+    let output_exec_path = match os_name{
+        "linux" => { output_dir_4.join("byeefree_log_time_service.exec") },
+        "macos" => { output_dir_1.join("byeefree_log_time_service.exec") },
+        _ => { return Err("unknown OS".into()); }, 
+    };
     
     // 将嵌入的二进制数据写入文件 
     match os_name {
