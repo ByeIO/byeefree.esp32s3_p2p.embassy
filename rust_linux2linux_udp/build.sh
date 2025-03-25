@@ -13,3 +13,5 @@ rustup target list | grep aarch64
 cargo zigbuild --release --example service_installer --target aarch64-unknown-linux-gnu
 cargo zigbuild --release --example service_installer
 cargo zigbuild --release --example log_file_service --target aarch64-unknown-linux-gnu
+cargo-zigbuild run --example udp_base64
+cargo-zigbuild run --release --example udp_tcp_multi_package > ./result/udp_tcp_multi_package.log

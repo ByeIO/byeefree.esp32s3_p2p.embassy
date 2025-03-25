@@ -11,6 +11,8 @@ base64 = "0.22.1"
 clap = { version = "4.5.32", features = ["derive"] }
 # 网络协议栈
 edge-net = { version = "0.9.3", features = ["std"] }
+edge-raw = { path = "./static/edge-raw", version = "0.4.0", features = ["std"] }
+edge-nal = "0.4.2"
 # systemd操作接口
 # libsystemd = { version = "0.7.0", path = "./static/libsystemd" }
 systemctl = "0.4.0"

@@ -403,7 +403,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b1761ef371a52e49015be37af0388ff0b2de1d87ddc3cf3ca57f7e15ad014a"
 dependencies = [
  "edge-nal",
- "edge-raw",
+ "edge-raw 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "embassy-futures",
  "embassy-time",
  "heapless",
@@ -492,8 +492,17 @@ dependencies = [
  "edge-mqtt",
  "edge-nal",
  "edge-nal-std",
- "edge-raw",
+ "edge-raw 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "edge-ws",
+]
+
+[[package]]
+name = "edge-raw"
+version = "0.4.0"
+dependencies = [
+ "edge-nal",
+ "embedded-io-async",
+ "log",
 ]
 
 [[package]]
@@ -1177,7 +1186,9 @@ version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
  "clap",
+ "edge-nal",
  "edge-net",
+ "edge-raw 0.4.0",
  "embed-file",
  "env_logger",
  "nusb",
