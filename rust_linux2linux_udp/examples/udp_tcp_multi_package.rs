@@ -12,9 +12,10 @@ use embed_file::embed_bytes;
 
 // 网络协议相关
 use edge_nal;
+use core::net::{Ipv4Addr, SocketAddrV4};
+
 // base64编码
 use base64;
-use core::net::{Ipv4Addr, SocketAddrV4};
 
 // 网络传输参数
 const SRC_ADDR : [u8; 4] = [10, 168, 233, 233];

@@ -1,3 +1,5 @@
 # 忽略大文件
 tools/*
 target/*
+# 忽略子项目
+rust_linux2linux_udp

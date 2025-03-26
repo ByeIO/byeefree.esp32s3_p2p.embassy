@@ -15,3 +15,10 @@ cargo zigbuild --release --example service_installer
 cargo zigbuild --release --example log_file_service --target aarch64-unknown-linux-gnu
 cargo-zigbuild run --example udp_base64
 cargo-zigbuild run --release --example udp_tcp_multi_package > ./result/udp_tcp_multi_package.log
+sudo cargo-zigbuild run --release --example tap_interface
+cargo-zigbuild run --release --example tap_interface
+cargo-zigbuild run --release --example nusb_attach
+cargo-zigbuild run --release --example nusb_control
+cargo-zigbuild run --release --example read_write_usb_cdc
+cargo-zigbuild run --example wasmer_ubuntu
+cargo-zigbuild run --release --example clap_byeefree

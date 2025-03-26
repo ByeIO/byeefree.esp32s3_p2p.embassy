@@ -18,6 +18,8 @@ edge-nal = "0.4.2"
 systemctl = "0.4.0"
 # 异步框架
 tokio = "1.44.1"
+# 异步框架
+futures-lite = "2.6.0"
 # usb设备通信(纯rust)
 nusb = { version = "0.2.0-beta", path = "./static/nusb" } 
 # 虚拟网卡接口
@@ -26,3 +28,14 @@ tappers = "0.4.2"
 embed-file = "0.2.0"
 # 日志记录
 env_logger = "0.11.7"
+# mosh命令行
+moshudp = { path = "./static/moshudp" }
+# 文件同步
+bitar = { path = "./static/bita/bitar" }
+fast_rsync = { path = "./static/fast_rsync" }
+# wasm运行时
+wasmer = "5.0.4"
+# wasm开发框架
+xtask-wasm = "0.3.1"
+# 数据库(wasm版)
+sqlite-wasm-rs = { version = "0.3.1", default-features = false, features = ["precompiled"] }

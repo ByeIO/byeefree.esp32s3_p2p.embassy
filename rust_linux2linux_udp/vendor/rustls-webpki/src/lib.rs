@@ -23,12 +23,15 @@
 //! | ------- | ----------- |
 //! | `alloc` | Enable features that require use of the heap. Currently all RSA signature algorithms require this feature. |
 //! | `std` | Enable features that require libstd. Implies `alloc`. |
+//! | `ring` | Enable use of the *ring* crate for cryptography. |
+//! | `aws-lc-rs` | Enable use of the aws-lc-rs crate for cryptography. Previously this feature was named `aws_lc_rs`. |
 
-#![cfg_attr(not(feature = "std"), no_std)]
-#![warn(unreachable_pub)]
-#![deny(warnings, missing_docs, clippy::as_conversions)]
+#![no_std]
+#![warn(elided_lifetimes_in_paths, unreachable_pub, clippy::use_self)]
+#![deny(missing_docs, clippy::as_conversions)]
 #![allow(
     clippy::len_without_is_empty,
+    clippy::manual_let_else,
     clippy::new_without_default,
     clippy::single_match,
     clippy::single_match_else,
@@ -36,7 +39,10 @@
     clippy::upper_case_acronyms
 )]
 // Enable documentation for all features on docs.rs
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
+
+#[cfg(any(feature = "std", test))]
+extern crate std;
 
 #[cfg(any(test, feature = "alloc"))]
 #[cfg_attr(test, macro_use)]
@@ -45,10 +51,14 @@ extern crate alloc;
 #[macro_use]
 mod der;
 
-mod calendar;
+#[cfg(feature = "aws-lc-rs")]
+mod aws_lc_rs_algs;
 mod cert;
 mod end_entity;
 mod error;
+#[cfg(feature = "ring")]
+mod ring_algs;
+mod rpk_entity;
 mod signed_data;
 mod subject_name;
 mod time;
@@ -58,40 +68,113 @@ mod crl;
 mod verify_cert;
 mod x509;
 
-#[allow(deprecated)]
-pub use trust_anchor::{TlsClientTrustAnchors, TlsServerTrustAnchors};
-
 #[cfg(test)]
 pub(crate) mod test_utils;
 
 pub use {
-    cert::{Cert, EndEntityOrCa},
-    crl::{BorrowedCertRevocationList, BorrowedRevokedCert, CertRevocationList, RevocationReason},
+    cert::Cert,
+    crl::{
+        BorrowedCertRevocationList, BorrowedRevokedCert, CertRevocationList, ExpirationPolicy,
+        RevocationCheckDepth, RevocationOptions, RevocationOptionsBuilder, RevocationReason,
+        UnknownStatusPolicy,
+    },
     end_entity::EndEntityCert,
-    error::Error,
-    signed_data::{
-        SignatureAlgorithm, ECDSA_P256_SHA256, ECDSA_P256_SHA384, ECDSA_P384_SHA256,
-        ECDSA_P384_SHA384, ED25519,
-    },
-    subject_name::{
-        AddrParseError, DnsNameRef, InvalidDnsNameError, InvalidSubjectNameError, IpAddrRef,
-        SubjectNameRef,
-    },
-    time::Time,
-    trust_anchor::TrustAnchor,
+    error::{DerTypeId, Error, InvalidNameContext},
+    rpk_entity::RawPublicKeyEntity,
+    trust_anchor::anchor_from_trusted_cert,
     verify_cert::KeyUsage,
+    verify_cert::VerifiedPath,
 };
 
 #[cfg(feature = "alloc")]
-pub use {
-    crl::{OwnedCertRevocationList, OwnedRevokedCert},
-    signed_data::{
+pub use crl::{OwnedCertRevocationList, OwnedRevokedCert};
+
+#[cfg(feature = "ring")]
+/// Signature verification algorithm implementations using the *ring* crypto library.
+pub mod ring {
+    pub use super::ring_algs::{
+        ECDSA_P256_SHA256, ECDSA_P256_SHA384, ECDSA_P384_SHA256, ECDSA_P384_SHA384, ED25519,
+    };
+
+    #[cfg(feature = "alloc")]
+    pub use super::ring_algs::{
         RSA_PKCS1_2048_8192_SHA256, RSA_PKCS1_2048_8192_SHA384, RSA_PKCS1_2048_8192_SHA512,
         RSA_PKCS1_3072_8192_SHA384, RSA_PSS_2048_8192_SHA256_LEGACY_KEY,
         RSA_PSS_2048_8192_SHA384_LEGACY_KEY, RSA_PSS_2048_8192_SHA512_LEGACY_KEY,
-    },
-    subject_name::{DnsName, IpAddr},
-};
+    };
+}
+
+#[cfg(feature = "aws-lc-rs")]
+/// Signature verification algorithm implementations using the aws-lc-rs crypto library.
+pub mod aws_lc_rs {
+    pub use super::aws_lc_rs_algs::{
+        ECDSA_P256_SHA256, ECDSA_P256_SHA384, ECDSA_P384_SHA256, ECDSA_P384_SHA384,
+        ECDSA_P521_SHA256, ECDSA_P521_SHA384, ECDSA_P521_SHA512, ED25519,
+        RSA_PKCS1_2048_8192_SHA256, RSA_PKCS1_2048_8192_SHA384, RSA_PKCS1_2048_8192_SHA512,
+        RSA_PKCS1_3072_8192_SHA384, RSA_PSS_2048_8192_SHA256_LEGACY_KEY,
+        RSA_PSS_2048_8192_SHA384_LEGACY_KEY, RSA_PSS_2048_8192_SHA512_LEGACY_KEY,
+    };
+}
+
+/// An array of all the verification algorithms exported by this crate.
+///
+/// This will be empty if the crate is built without the `ring` and `aws-lc-rs` features.
+pub static ALL_VERIFICATION_ALGS: &[&dyn pki_types::SignatureVerificationAlgorithm] = &[
+    #[cfg(feature = "ring")]
+    ring::ECDSA_P256_SHA256,
+    #[cfg(feature = "ring")]
+    ring::ECDSA_P256_SHA384,
+    #[cfg(feature = "ring")]
+    ring::ECDSA_P384_SHA256,
+    #[cfg(feature = "ring")]
+    ring::ECDSA_P384_SHA384,
+    #[cfg(feature = "ring")]
+    ring::ED25519,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PKCS1_2048_8192_SHA256,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PKCS1_2048_8192_SHA384,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PKCS1_2048_8192_SHA512,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PKCS1_3072_8192_SHA384,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PSS_2048_8192_SHA256_LEGACY_KEY,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PSS_2048_8192_SHA384_LEGACY_KEY,
+    #[cfg(all(feature = "ring", feature = "alloc"))]
+    ring::RSA_PSS_2048_8192_SHA512_LEGACY_KEY,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P256_SHA256,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P256_SHA384,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P384_SHA256,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P384_SHA384,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P521_SHA256,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P521_SHA384,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ECDSA_P521_SHA512,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::ED25519,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PKCS1_2048_8192_SHA256,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PKCS1_2048_8192_SHA384,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PKCS1_2048_8192_SHA512,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PKCS1_3072_8192_SHA384,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PSS_2048_8192_SHA256_LEGACY_KEY,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PSS_2048_8192_SHA384_LEGACY_KEY,
+    #[cfg(feature = "aws-lc-rs")]
+    aws_lc_rs::RSA_PSS_2048_8192_SHA512_LEGACY_KEY,
+];
 
 fn public_values_eq(a: untrusted::Input<'_>, b: untrusted::Input<'_>) -> bool {
     a.as_slice_less_safe() == b.as_slice_less_safe()
